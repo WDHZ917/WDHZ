@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>周周的个人空间</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            padding-top: 70px;
+            color: #fff;
+            /* 移除背景颜色设置 */
+        }
+
+        /* 动态图片背景样式 */
+        #dynamic-img-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        /* 导航栏样式 - 修改为不透明 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #222222;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            opacity: 1;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: white;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* 个人简介区域 */
+        .profile-header {
+            text-align: center;
+            padding: 40px 0;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
+            background-color: #333; /* 新增：设置深灰色背景 */
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-img:hover {
+            transform: scale(1.05);
+        }
+
+        /* 个人空间区域 */
+        .space-header {
+            text-align: center;
+            padding: 40px 0;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgb(255, 0, 0, 0.3);
+            background-color: #333; /* 新增：设置深灰色背景 */
+        }
+
+        /* 共用部分样式 */
+        section {
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
+            background-color: #333; /* 新增：设置深灰色背景 */
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .title,
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 1.1em;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+
+        .social-links a:hover::after {
+            width: 100%;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .skill {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .skill:hover {
+            transform: translateY(-2px);
+        }
+
+        .experience-item,
+        .education-item,
+        .hobby-item {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            background-color: #333; /* 新增：设置深灰色背景 */
+        }
+
+        .experience-item:hover,
+        .education-item:hover,
+        .hobby-item:hover {
+            transform: translateX(5px);
+        }
+
+        .date {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        /* 个人空间内容样式 */
+        .space-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .space-card {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            background-color: #333; /* 新增：设置深灰色背景 */
+        }
+
+        .space-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .space-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-content h3 {
+            margin-bottom: 10px;
+        }
+
+        .post-date {
+            font-size: 0.8em;
+        }
+
+        .read-more {
+            display: inline-block;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            border-radius: 8px;
+            background-color: #333; /* 新增：设置深灰色背景 */
+        }
+
+        /* 动画定义 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 60px;
+            }
+
+            .navbar {
+                padding: 10px 5%;
+                flex-direction: column;
+            }
+
+            .nav-links {
+                margin-top: 15px;
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .profile-header,
+            .space-header {
+                padding: 20px 0;
+            }
+
+            section {
+                padding: 20px;
+            }
+
+            .space-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 为.container添加margin-top以留出空白区域 */
+        .container {
+            margin-top: 1100px; /* 可以根据需要调整空白区域的高度 */
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <!-- 动态图片背景 -->
+    <img id="dynamic-img-bg" src="https://cdn.shopify.com/s/files/1/0548/8554/8183/files/Lockdown_animation_1.gif?v=1743781136&width=832" alt="动态背景图">
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">周周<span>的小空间</span></div>
+        <div class="nav-links">
+            <a class="tab-link active" data-tab="profile">个人简介</a>
+            <a class="tab-link" data-tab="space">个人空间</a>
+            <a class="tab-link" data-tab="contact">联系我</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 个人简介内容 -->
+        <div id="profile" class="content-section active">
+            <header class="profile-header">
+                <img src="https://via.placeholder.com/150" alt="周周的照片" class="profile-img">
+                <h1>周周</h1>
+                <p class="title">3D游戏模型师</p>
+                <p>热爱技术，追求卓越，致力于创造优秀视觉盛宴</p>
+                <div class="social-links">
+                    <a href="https://github.com/yourusername" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                    <a href="https://linkedin.com/in/yourusername" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                    <a href="mailto:your.email@example.com"><i class="fas fa-envelope"></i> Email</a>
+                </div>
+            </header>
+
+            <section id="about">
+                <h2>关于我</h2>
+                <p>我是一名有5年经验的模型设计师，专注于Maya与Zbrushi。我热衷于将设计转化为实体模型。</p>
+                <p>在业余时间，我喜欢进行各种运动，这有助于我有更好的状态去制作优秀的作品。</p>
+            </section>
+
+            <section id="skills">
+                <h2>技能</h2>
+                <div class="skills">
+                    <span class="skill">HTML5</span>
+                    <span class="skill">CSS3</span>
+                    <span class="skill">JavaScript</span>
+                    <span class="skill">React</span>
+                    <span class="skill">Vue.js</span>
+                    <span class="skill">Node.js</span>
+                    <span class="skill">TypeScript</span>
+                    <span class="skill">Git</span>
+                    <span class="skill">UI/UX设计</span>
+                    <span class="skill">响应式设计</span>
+                    <span class="skill">Webpack</span>
+                </div>
+            </section>
+
+            <section id="experience">
+                <h2>工作经历</h2>
+                <div class="experience-item">
+                    <h3>高级前端开发工程师 - ABC科技有限公司</h3>
+                    <p class="date">2020年1月 - 至今</p>
+                    <ul>
+                        <li>领导前端团队开发公司核心产品，使用React和Redux构建高性能Web应用</li>
+                        <li>优化应用性能，将页面加载时间减少40%</li>
+                        <li>实施单元测试和集成测试，提高代码质量</li>
+                        <li>指导初级开发人员，组织技术分享会</li>
+                    </ul>
+                </div>
+
+                <div class="experience-item">
+                    <h3>前端开发工程师 - XYZ创意公司</h3>
+                    <p class="date">2017年6月 - 2019年12月</p>
+                    <ul>
+                        <li>参与多个客户项目的开发，包括电商平台和企业管理系统</li>
+                        <li>使用Vue.js构建响应式用户界面</li>
+                        <li>与设计师紧密合作，确保设计稿的精确实现</li>
+                        <li>编写可重用的组件和工具库</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="education">
+                <h2>教育背景</h2>
+                <div class="education-item">
+                    <h3>计算机科学与技术 学士</h3>
+                    <p class="date">2013年9月 - 2017年6月</p>
+                    <p>某某大学</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- 个人空间内容 -->
+        <div id="space" class="content-section">
+            <header class="space-header">
+                <h1>周周的小空间</h1>
+                <p class="subtitle">分享我的生活点滴与创作</p>
+            </header>
+
+            <section id="blog">
+                <h2><i class="fas fa-code"></i> 技术博客</h2>
+                <div class="space-grid">
+                    <article class="space-card">
+                        <img src="https://via.placeholder.com/400x300" alt="React教程" class="space-img">
+                        <div class="card-content">
+                            <h3>React高级组件模式</h3>
+                            <p class="post-date">2023年5月15日</p>
+                            <p>分享我在React项目中使用的高阶组件和渲染属性模式，提高代码复用性...</p>
+                            <a href="#" class="read-more">阅读更多</a>
+                        </div>
+                    </article>
+
+                    <article class="space-card">
+                        <img src="https://via.placeholder.com/400x300" alt="Vue技巧" class="space-img">
+                        <div class="card-content">
+                            <h3>Vue 3组合式API实践</h3>
+                            <p class="post-date">2023年4月22日</p>
+                            <p>记录从Vue 2迁移到Vue 3的经验，以及组合式API带来的开发体验提升...</p>
+                            <a href="#" class="read-more">阅读更多</a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section id="photography">
+                <h2><i class="fas fa-camera"></i> 摄影作品</h2>
+                <div class="space-grid">
+                    <article class="space-card">
+                        <img src="https://via.placeholder.com/400x300" alt="城市风光" class="space-img">
+                        <div class="card-content">
+                            <h3>城市天际线</h3>
+                            <p class="post-date">2023年5月10日</p>
+                            <p>一组在黄昏时分拍摄的城市建筑照片，捕捉光影变化的魅力...</p>
+                            <a href="#" class="read-more">查看图集</a>
+                        </div>
+                    </article>
+
+                    <article class="space-card">
+                        <img src="https://via.placeholder.com/400x300" alt="自然风景" class="space-img">
+                        <div class="card-content">
+                            <h3>春日山野</h3>
+                            <p class="post-date">2023年4月5日</p>
+                            <p>春季踏青时拍摄的一组自然风光，记录大自然的复苏与生机...</p>
+                            <a href="#" class="read-more">查看图集</a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>© 2023 周周的个人空间. 保留所有权利。</p>
+            <p>最后更新: 2023年6月</p>
+        </footer>
+    </div>
+
+    <script>
+        // 页面加载动画
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                document.querySelector('.loader').classList.add('hidden');
+            }, 1000);
+        });
+
+        // 滚动动画
+        document.addEventListener('DOMContentLoaded', function () {
+            const sections = document.querySelectorAll('section');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+
+        // 为技能标签添加随机延迟动画
+        document.addEventListener('DOMContentLoaded', function () {
+            const skills = document.querySelectorAll('.skill');
+            skills.forEach((skill, index) => {
+                skill.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // 为卡片添加延迟动画
+            const cards = document.querySelectorAll('.space-card, .experience-item, .education-item, .hobby-item');
+            cards.forEach((card, index) => {
+                card.style.transitionDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+
+</html>    
